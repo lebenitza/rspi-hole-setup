@@ -14,7 +14,6 @@ services:
     container_name: unbound
     image: alpinelinux/unbound
     restart: unless-stopped
-    # network_mode: host
     depends_on:
       - unbound-helper
     ports:
@@ -30,7 +29,6 @@ services:
     build:
       context: unbound-exporter
     restart: unless-stopped
-    # network_mode: host
     depends_on:
       - unbound
     environment:
@@ -47,13 +45,12 @@ services:
     container_name: pihole
     image: pihole/pihole:2023.02.2
     restart: unless-stopped
-    # network_mode: host
     depends_on:
       - unbound
     ports:
-      - "9053:53/tcp"
-      - "9053:53/udp"
-      - "9080:80/tcp"
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
     environment:
       TZ: 'Europe/Bucharest'
       WEBPASSWORD_FILE: /run/secrets/pihole_password
@@ -71,7 +68,6 @@ services:
     build:
       context: pihole-exporter
     restart: unless-stopped
-    # network_mode: host
     depends_on:
       - pihole
     ports:
@@ -111,6 +107,7 @@ services:
       - "3100:3100"
     volumes:
       - './data/loki:/loki:rw'
+      - './loki.yml:/etc/loki/local-config.yaml'
 
   promtail:
     container_name: promtail
@@ -133,6 +130,8 @@ services:
       - prometheus
     ports:
       - 3000:3000
+    environment:
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
     volumes:
       - ./data/grafana/datasources:/etc/grafana/provisioning/datasources
       - ./data/grafana/lib:/var/lib/grafana
