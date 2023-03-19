@@ -77,6 +77,23 @@ services:
     secrets:
       - pihole_password
 
+  pihole-exporter:
+    container_name: pihole-exporter
+    build:
+      context: pihole-exporter
+    restart: unless-stopped
+    # network_mode: host
+    depends_on:
+      - pihole
+    ports:
+      - "9168:9168/tcp"
+    environment:
+      PORT: 9168
+      PIHOLE_HOSTNAME: pihole
+      PIHOLE_PASSWORD_FILE: /run/secrets/pihole_password
+    secrets:
+      - pihole_password
+
 secrets:
    pihole_password:
      file: pihole_password.txt
