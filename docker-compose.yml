@@ -19,9 +19,9 @@ services:
     depends_on:
       - unbound-helper
     ports:
-      - "127.0.0.1:5335:5335/tcp"
-      - "127.0.0.1:5335:5335/udp"
-      - "127.0.0.1:8953:8953/tcp"
+      - "5335/tcp"
+      - "5335/udp"
+      - "8953/tcp"
     volumes:
       - './data/unbound/logs:/var/log/unbound:rw'
       - './data/unbound/etc:/etc/unbound:rw'
