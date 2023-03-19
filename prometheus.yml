@@ -1,0 +1,20 @@
+# Prometheus Config
+
+global:
+  scrape_interval:     5m # Default 1min
+  evaluation_interval: 5m # Default 1min
+  scrape_timeout:      5s # Default 10s
+
+# Scrape configuration
+scrape_configs:
+  - job_name: unbound
+    scrape_interval: 1m
+    scrape_timeout: 5s
+    static_configs:
+      - targets: ['unbound-exporter:9167']
+
+  - job_name: pihole
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    static_configs:
+      - targets: ['pihole-exporter:9168']
