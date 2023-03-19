@@ -1,0 +1,82 @@
+version: "3"
+
+services:
+  unbound-helper:
+    container_name: unbound-helper
+    image: alpinelinux/unbound
+    restart: on-failure
+    entrypoint: []
+    command: chown -R unbound:unbound /var/log/unbound
+    volumes:
+      - './data/unbound/logs:/var/log/unbound:rw'
+
+  unbound:
+    container_name: unbound
+    image: alpinelinux/unbound
+    restart: unless-stopped
+    # network_mode: host
+    depends_on:
+      - unbound-helper
+    ports:
+      - "5335:5335/tcp"
+      - "5335:5335/udp"
+      - "8953:8953/tcp"
+    volumes:
+      - './data/unbound/logs:/var/log/unbound:rw'
+      - './data/unbound/etc:/etc/unbound:rw'
+
+  unbound-cli:
+    container_name: unbound-cli
+    image: alpinelinux/unbound
+    restart: on-failure
+    entrypoint: []
+    command: tail -f /var/log/unbound/unbound.log
+    depends_on:
+      - unbound
+    volumes:
+      - './data/unbound/logs:/var/log/unbound:ro'
+
+  unbound-exporter:
+    container_name: unbound-exporter
+    build:
+      context: unbound-exporter
+    restart: unless-stopped
+    # network_mode: host
+    depends_on:
+      - unbound
+    environment:
+      UNBOUND_URI: tcp://unbound:8953
+      UNBOUND_SERVER_CERT_PATH: /etc/unbound/unbound_server.pem
+      UNBOUND_CONTROL_CERT_PATH: /etc/unbound/unbound_control.pem
+      UNBOUND_CONTROL_KEY_PATH: /etc/unbound/unbound_control.key
+    volumes:
+      - './data/unbound/etc:/etc/unbound:ro'
+    ports:
+      - "9167:9167/tcp"
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:2023.02.2
+    restart: unless-stopped
+    # network_mode: host
+    depends_on:
+      - unbound
+    ports:
+      - "9053:53/tcp"
+      - "9053:53/udp"
+      - "9080:80/tcp"
+    environment:
+      TZ: 'Europe/Bucharest'
+      WEBPASSWORD_FILE: /run/secrets/pihole_password
+      PIHOLE_DNS_: unbound#5335;unbound#5335
+      IPv6: false
+    volumes:
+      - './data/pihole/etc:/etc/pihole:rw'
+      - './data/pihole/logs:/var/log/pihole:rw'
+      - './data/dnsmasq:/etc/dnsmasq.d:rw'
+    secrets:
+      - pihole_password
+
+secrets:
+   pihole_password:
+     file: pihole_password.txt
