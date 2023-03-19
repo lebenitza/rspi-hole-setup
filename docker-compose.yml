@@ -6,6 +6,7 @@ services:
     image: alpinelinux/unbound
     restart: on-failure
     entrypoint: []
+    user: root
     command: chown -R unbound:unbound /var/log/unbound
     volumes:
       - './data/unbound/logs:/var/log/unbound:rw'
@@ -78,6 +79,16 @@ services:
       PIHOLE_PASSWORD_FILE: /run/secrets/pihole_password
     secrets:
       - pihole_password
+
+  prometheus-helper:
+    container_name: prometheus-helper
+    image: prom/prometheus:v2.42.0
+    restart: on-failure
+    entrypoint: []
+    user: root
+    command: chown -R nobody:nobody /prometheus
+    volumes:
+      - './data/prometheus:/prometheus:rw'
 
   prometheus:
     container_name: prometheus
