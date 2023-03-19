@@ -50,7 +50,7 @@ services:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "127.0.0.1:9080:80/tcp"
+      - "9080:80/tcp"
     environment:
       TZ: 'Europe/Bucharest'
       WEBPASSWORD_FILE: /run/secrets/pihole_password
