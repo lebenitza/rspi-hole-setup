@@ -143,6 +143,16 @@ services:
       - './promtail.yml:/etc/promtail/config.yml'
     command: -config.file=/etc/promtail/config.yml
 
+  grafana-helper:
+    container_name: grafana-helper
+    image: grafana/grafana:9.4.3
+    restart: on-failure
+    entrypoint: []
+    user: root
+    command: chown -R grafana:grafana /var/lib/grafana
+    volumes:
+      - './data/grafana/lib:/var/lib/grafana:rw'
+
   grafana:
     container_name: grafana
     image: grafana/grafana:9.4.3
@@ -155,8 +165,8 @@ services:
     environment:
       GF_INSTALL_PLUGINS: grafana-piechart-panel
     volumes:
-      - ./data/grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./data/grafana/lib:/var/lib/grafana
+      - './data/grafana/datasources:/etc/grafana/provisioning/datasources:rw'
+      - './data/grafana/lib:/var/lib/grafana:rw'
 
 secrets:
    pihole_password:
