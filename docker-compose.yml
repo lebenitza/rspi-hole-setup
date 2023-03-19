@@ -149,7 +149,7 @@ services:
     restart: on-failure
     entrypoint: []
     user: root
-    command: chown -R grafana:grafana /var/lib/grafana
+    command: chown -R grafana:root /var/lib/grafana
     volumes:
       - './data/grafana/lib:/var/lib/grafana:rw'
 
