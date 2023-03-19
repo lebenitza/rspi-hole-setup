@@ -15,6 +15,7 @@ services:
     container_name: unbound
     image: alpinelinux/unbound
     restart: unless-stopped
+    network_mode: host
     depends_on:
       - unbound-helper
     ports:
@@ -30,10 +31,11 @@ services:
     build:
       context: unbound-exporter
     restart: unless-stopped
+    network_mode: host
     depends_on:
       - unbound
     environment:
-      UNBOUND_URI: tcp://unbound:8953
+      UNBOUND_URI: tcp://127.0.0.1:8953
       UNBOUND_SERVER_CERT_PATH: /etc/unbound/unbound_server.pem
       UNBOUND_CONTROL_CERT_PATH: /etc/unbound/unbound_control.pem
       UNBOUND_CONTROL_KEY_PATH: /etc/unbound/unbound_control.key
@@ -46,6 +48,7 @@ services:
     container_name: pihole
     image: pihole/pihole:2023.02.2
     restart: unless-stopped
+    network_mode: host
     depends_on:
       - unbound
     ports:
@@ -55,7 +58,7 @@ services:
     environment:
       TZ: 'Europe/Bucharest'
       WEBPASSWORD_FILE: /run/secrets/pihole_password
-      PIHOLE_DNS_: unbound#5335;unbound#5335
+      PIHOLE_DNS_: 127.0.0.1#5335;127.0.0.1#5335
       IPv6: false
     volumes:
       - './data/pihole/etc:/etc/pihole:rw'
@@ -69,13 +72,14 @@ services:
     build:
       context: pihole-exporter
     restart: unless-stopped
+    network_mode: host
     depends_on:
       - pihole
     ports:
       - "127.0.0.1:9168:9168/tcp"
     environment:
       PORT: 9168
-      PIHOLE_HOSTNAME: pihole
+      PIHOLE_HOSTNAME: 127.0.0.1
       PIHOLE_PASSWORD_FILE: /run/secrets/pihole_password
     secrets:
       - pihole_password
@@ -94,6 +98,7 @@ services:
     container_name: prometheus
     image: prom/prometheus:v2.42.0
     restart: unless-stopped
+    network_mode: host
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -124,6 +129,7 @@ services:
     container_name: loki
     image: grafana/loki:2.7.3
     restart: unless-stopped
+    network_mode: host
     command: -config.file=/etc/loki/local-config.yaml
     ports:
       - "127.0.0.1:3100:3100"
@@ -135,13 +141,15 @@ services:
     container_name: promtail
     image: grafana/promtail:2.7.3
     restart: unless-stopped
+    network_mode: host
+    command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
       - unbound
     volumes:
       - './data/unbound/logs:/var/log/unbound:ro'
       - './promtail.yml:/etc/promtail/config.yml'
-    command: -config.file=/etc/promtail/config.yml
+    
 
   grafana-helper:
     container_name: grafana-helper
@@ -157,6 +165,7 @@ services:
     container_name: grafana
     image: grafana/grafana:9.4.3
     restart: unless-stopped
+    network_mode: host
     depends_on:
       - loki
       - prometheus
