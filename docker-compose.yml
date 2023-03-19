@@ -112,6 +112,31 @@ services:
     volumes:
       - './data/loki:/loki:rw'
 
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:2.7.3
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - unbound
+    volumes:
+      - './data/unbound/logs:/var/log/unbound:ro'
+      - './promtail.yml:/etc/promtail/config.yml'
+    command: -config.file=/etc/promtail/config.yml
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:9.4.3
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./data/grafana/lib:/var/lib/grafana
+
 secrets:
    pihole_password:
      file: pihole_password.txt
