@@ -2,6 +2,7 @@ auth_enabled: false
 
 server:
   http_listen_port: 3100
+  http_listen_address: 127.0.0.1
 
 query_scheduler:
   max_outstanding_requests_per_tenant: 10000

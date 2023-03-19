@@ -42,7 +42,7 @@ services:
     volumes:
       - './data/unbound/etc:/etc/unbound:ro'
     ports:
-      - "9167:9167/tcp"
+      - "9167/tcp"
 
   pihole:
     container_name: pihole
@@ -52,9 +52,9 @@ services:
     depends_on:
       - unbound
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "9080:80/tcp"
+      - "53/tcp"
+      - "53/udp"
+      - "80/tcp"
     environment:
       TZ: 'Europe/Bucharest'
       WEBPASSWORD_FILE: /run/secrets/pihole_password
@@ -76,7 +76,7 @@ services:
     depends_on:
       - pihole
     ports:
-      - "127.0.0.1:9168:9168/tcp"
+      - "9168/tcp"
     environment:
       PORT: 9168
       PIHOLE_HOSTNAME: 127.0.0.1
@@ -110,7 +110,7 @@ services:
       - unbound-exporter
       - pihole-exporter
     ports:
-      - "9090:9090/tcp"
+      - "9090/tcp"
     volumes:
       - './prometheus.yml:/etc/prometheus/prometheus.yml:rw'
       - './data/prometheus:/prometheus:rw'
@@ -132,7 +132,7 @@ services:
     network_mode: host
     command: -config.file=/etc/loki/local-config.yaml
     ports:
-      - "127.0.0.1:3100:3100"
+      - "3100"
     volumes:
       - './data/loki:/loki:rw'
       - './loki.yml:/etc/loki/local-config.yaml'
@@ -170,7 +170,7 @@ services:
       - loki
       - prometheus
     ports:
-      - "3000:3000"
+      - "3000/tcp"
     environment:
       GF_INSTALL_PLUGINS: grafana-piechart-panel
     volumes:

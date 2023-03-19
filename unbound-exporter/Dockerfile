@@ -15,6 +15,7 @@ COPY --from=builder /build/unbound-exporter/unbound-exporter /usr/local/bin/unbo
 
 CMD exec /usr/local/bin/unbound-exporter \
     --block-file='' \
+    --web.listen-address=127.0.0.1:9167 \
     --unbound.uri=$UNBOUND_URI \
     --unbound.server-cert=$UNBOUND_SERVER_CERT_PATH \
     --unbound.control-cert=$UNBOUND_CONTROL_CERT_PATH \
